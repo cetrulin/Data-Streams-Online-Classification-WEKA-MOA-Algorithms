@@ -9,10 +9,11 @@ IGNGSVM*
 Implementación de la primera propuesta de IGNGSVM en:
 https://www.dropbox.com/s/yqa7l6ueg8nfakf/Memoria%20TFG%20Andr%C3%A9s%20Le%C3%B3n%20Su%C3%A1rez%20Cetrulo.pdf
 
+**Para ambos algoritmos se utiliza LibSVM de WEKA como librería de Support Vector Machines. La recuperación de los SVs se hace desde el .jar de la librería.
+
 
 GNG
 ===
 Implementación de Growing Neural Gas en MOA como método de reducción para IGNGSVM.
 
 
-**Para ambos algoritmos se utiliza LibSVM de WEKA como librería de Support Vector Machines. La recuperación de los SVs se hace desde el .jar de la librería.
