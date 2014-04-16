@@ -14,6 +14,11 @@ https://www.dropbox.com/s/yqa7l6ueg8nfakf/Memoria%20TFG%20Andr%C3%A9s%20Le%C3%B3
 
 GNG
 ===
-Implementación de Growing Neural Gas en MOA como método de reducción para IGNGSVM.
+Implementación de Growing Neural Gas (Fritzke, 1995) en MOA como método de reducción para IGNGSVM. Pese a encontrarse en el paquete clutering, no es clustering pues no tiene en cuenta etiquetas ni realiza etiquetado por agrupación; es un método de data-reduction propuesto por Fritzke
+
+
+Task & Evaluation
+====
+Contienen modificaciones sobre su código inicial para la evaluación simultánea de archivos de entrenamiento y test. Esto se explica en el documento en donde se presenta IGNGSVM; su motivación es realizar la clasificación a tiempo, respetando el contexto existente en el dominio (Concept Drift).
 
 
