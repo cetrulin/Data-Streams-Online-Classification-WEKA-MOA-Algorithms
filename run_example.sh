@@ -1,5 +1,5 @@
 # Author Andres L. Suarez-Cetrulo (@cetrulin)
-# WEKA and MOA used versions are the latest arc packages available in March 2012.
+# WEKA and MOA used versions are the latest src packages available in March 2012.
 
 #!/bin/bash
 
