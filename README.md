@@ -1,10 +1,10 @@
 OISVM*
 ===
-Implementation of OI-SVM for MOA, proposed in http://dx.doi.org/10.1007/978-3-642-15822-3_9
+Implementation of Online Incremental Learning Support Vector Machine (OI-SVM) for MOA. Proposed in http://dx.doi.org/10.1007/978-3-642-15822-3_9
 
 IGNGSVM*
 ===
-Implementation of iGNGSVM for MOA, proposed in https://doi.org/10.1016/j.neucom.2016.12.093
+Implementation of iGNGSVM for MOA. Algorithm proposed in https://doi.org/10.1016/j.neucom.2016.12.093
 
 OISVM and IGNGSVM have previously being compared in http://hdl.handle.net/10016/19258
 Both implementations use LibSVM for WEKA (its jar file is present in the root of this repo). 
