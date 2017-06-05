@@ -95,7 +95,7 @@ import moa.options.IntOption;
  * 
  <!-- options-end -->
  *  
- * @author Andres L. Suarez-Cetrulo (suarez@cetrulo.es)
+ * @author Andres L. Suarez-Cetrulo (suarezcetrulo@gmail.com)
  * @version $Revision: 0001 $
  */
 public class WilsonEditing
