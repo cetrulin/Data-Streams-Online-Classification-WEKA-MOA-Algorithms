@@ -1,11 +1,7 @@
-package moa.clusterers.gng;
+package moa.classifiers.igngsvm.gng;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-/**
-	Version modificada para de prototipo.java incluido en ILVQ.jar 
-	por Andrés León Suárez Cetrulo
-*/
 
 public class Gprototipo {
 	public double w[];
@@ -31,9 +27,6 @@ public class Gprototipo {
 	public int getClase(){
 		return clase;
 	}
-	/*public Instance getInstance(){
-		return instance;
-	}*/
 
 	@Override
 	public int hashCode() {

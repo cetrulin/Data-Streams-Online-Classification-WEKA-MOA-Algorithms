@@ -1,24 +1,23 @@
 OISVM*
 ===
-Implementación para estudio experimental del algoritmo OI-SVM en MOA, propuesto en:
-Zheng, Jun, Hui Yu, Furao Shen, and Jinxi Zhao. “An Online Incremental Learning Support Vector Machine for Large-Scale Data.” In Artificial Neural Networks – ICANN 2010, edited by Konstantinos Diamantaras, Wlodek Duch, and LazarosS. Iliadis, 6353:76–81. Lecture Notes in Computer Science. Springer Berlin Heidelberg, 2010. http://dx.doi.org/10.1007/978-3-642-15822-3_9.
-
+OI-SVM implementation for MOA, proposed in http://dx.doi.org/10.1007/978-3-642-15822-3_9
 
 IGNGSVM*
 ===
-Implementación de la primera propuesta de IGNGSVM en:
-https://www.dropbox.com/s/yqa7l6ueg8nfakf/Memoria%20TFG%20Andr%C3%A9s%20Le%C3%B3n%20Su%C3%A1rez%20Cetrulo.pdf
+Implementation of iGNGSVM used in https://doi.org/10.1016/j.neucom.2016.12.093
 
-**Para ambos algoritmos se utiliza LibSVM de WEKA como librería de Support Vector Machines. La recuperación de los SVs se hace desde el .jar de la librería.
-
+**Both OISVM and IGNGSVM use the LibSVM for WEKA jar file present in the root of this repo. Support Vectors are retrieved from the SVM using JAR's classes objects.
 
 GNG
 ===
-Implementación de Growing Neural Gas (Fritzke, 1995) en MOA como método de reducción para IGNGSVM. Pese a encontrarse en el paquete clutering, no es clustering pues no tiene en cuenta etiquetas ni realiza etiquetado por agrupación; es un método de data-reduction propuesto por Fritzke
+Growing Neural Gas is implemented in MOA as topology generation method for IGNGSVM. Proposed by Fritzke in 1995 https://papers.nips.cc/paper/893-a-growing-neural-gas-network-learns-topologies.pdf 
 
+Wilson Edited (Also known as Edited Nearest-Neighbor)
+===
+Noise reduction algorithm based in Nearest Neighbors. Proposed in https://doi.org/10.1109/TSMC.1972.4309137
 
 Task & Evaluation
 ====
-Contienen modificaciones sobre su código inicial para la evaluación simultánea de archivos de entrenamiento y test. Esto se explica en el documento en donde se presenta IGNGSVM; su motivación es realizar la clasificación a tiempo, respetando el contexto existente en el dominio (Concept Drift).
+It evaluates test and train in parallel to allow online evaluation for non-stationary environments in presence of concept drift.
 
 

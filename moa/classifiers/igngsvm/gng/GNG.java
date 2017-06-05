@@ -1,4 +1,4 @@
-package moa.clusterers.gng;
+package moa.classifiers.igngsvm.gng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +16,6 @@ import moa.options.IntOption;
 
 public class GNG extends AbstractClusterer {
 
-	/**
-	 * Algoritmo implementado, siguiendo la nomenclatura utilizada en ILVQ.jar
-	 * por Andrés León Suárez Cetrulo
-	 */
 	private static final long serialVersionUID = -8566293434212159290L;
 
 	private ArrayList<Gprototipo> S;	
@@ -39,15 +35,16 @@ public class GNG extends AbstractClusterer {
 	public Gprototipo[] obtenerCercanos(double patron[]){
 		Gprototipo ganador,segundon;
 		Gprototipo p[]=new Gprototipo[2];
-		if(S.size()>=2){
+		
+		if(S.size()>=2){		
 			if(Gprototipo.dist(S.get(0).w,patron)<=Gprototipo.dist(S.get(1).w,patron)){
 				ganador = S.get(0);
-				segundon = S.get(1);
+				segundon = S.get(1);			
 			}else{
 				ganador = S.get(1);
 				segundon = S.get(0);
-			}
-			for (int j = 2; j < S.size(); j++) {
+				
+			}for (int j = 2; j < S.size(); j++) {
 				if(Gprototipo.dist(S.get(j).w,patron)<Gprototipo.dist(ganador.w,patron)){
 					segundon = ganador;
 					ganador = S.get(j);
@@ -120,6 +117,7 @@ public class GNG extends AbstractClusterer {
 		for (int i = 0; i < patron.length; i++) {
 			patron[i]=inst.value(i);
 		}
+		//System.out.println("-----------------"+inst.value(0)+" "+inst.classValue());
 		/**********************************seguimos inicializando patrones*************************************************/
 		
 		if(Gprototipo.numeroGprototipos(S)<2){			
@@ -141,7 +139,7 @@ public class GNG extends AbstractClusterer {
 			//3. Se incrementa la edad de todas las conexiones de s1
 			s1.actualizarEdades();
 			
-			//4. Variable local de acumulación de error de s1
+			//4. Variable local de acumulaciÔøΩn de error de s1
 			s1.setError(s1.getError()+s1.dist(s1.w.clone(),patron));			
 
 			/*************************************actualizamos las posiciones de los prototipos**************************************/
