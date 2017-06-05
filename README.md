@@ -8,7 +8,7 @@ Implementation of iGNGSVM for MOA. https://doi.org/10.1016/j.neucom.2016.12.093
 
 OISVM and IGNGSVM have previously been compared in http://hdl.handle.net/10016/19258
 Both implementations use LibSVM for WEKA (its jar file is present in the root of this repo). 
-Support Vectors are retrieved from the SVM using this jar's object.
+Support Vectors are retrieved from the SVM using the jar's object.
 
 GNG
 ===
