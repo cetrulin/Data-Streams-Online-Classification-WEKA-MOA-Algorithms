@@ -1,6 +1,6 @@
 OISVM*
 ===
-Implementation of Online Incremental Learning Support Vector Machine (OI-SVM) for MOA. Proposed in http://dx.doi.org/10.1007/978-3-642-15822-3_9
+Implementation of Online Incremental Learning Support Vector Machine (OI-SVM) for MOA. http://dx.doi.org/10.1007/978-3-642-15822-3_9
 
 IGNGSVM*
 ===
@@ -16,7 +16,7 @@ Growing Neural Gas is implemented in MOA as topology generation method for IGNGS
 
 Wilson Edited (Also known as Edited Nearest-Neighbor)
 ===
-Noise reduction algorithm based in Nearest Neighbors. Proposed in https://doi.org/10.1109/TSMC.1972.4309137
+Noise reduction algorithm based in Nearest Neighbors. https://doi.org/10.1109/TSMC.1972.4309137
 
 Task & Evaluation
 ====
