@@ -20,4 +20,4 @@ Noise reduction algorithm based in Nearest Neighbors. https://doi.org/10.1109/TS
 
 Task & Evaluation
 ====
-It evaluates test and train in parallel to allow online evaluation for non-stationary environments in presence of concept drift.
+EvaluateChunksTwoFiles, in '/moa/tasks',  evaluates test and train in parallel to allow online evaluation for non-stationary environments in presence of concept drift.
