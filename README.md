@@ -20,4 +20,4 @@ Noise reduction algorithm based in Nearest Neighbors. https://doi.org/10.1109/TS
 
 Task & Evaluation
 ====
-EvaluateChunksTwoFiles, in '/moa/tasks',  evaluates test and train in parallel to allow online evaluation for non-stationary environments in presence of concept drift.
+EvaluateChunksTwoFiles, in '/moa/tasks',  evaluates test and train in parallel to allow online evaluation for non-stationary environments in presence of concept drift. Albeit this is not the only Task that can be run in MOA for this purpose. For example, run_example.sh uses EvaluateInterleavedTestThenTrain as task (http://www.cs.waikato.ac.nz/~abifet/MOA/API/classmoa_1_1tasks_1_1_evaluate_interleaved_test_then_train.html).
