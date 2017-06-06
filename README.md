@@ -8,7 +8,7 @@ OISVM
 Implementation of [Online Incremental Learning Support Vector Machine (OI-SVM)](http://dx.doi.org/10.1007/978-3-642-15822-3_9) for [MOA](http://moa.cms.waikato.ac.nz). See it in '/moa/classifiers'.
 
 ```
-OISVM and IGNGSVM have previously been compared [here](http://hdl.handle.net/10016/19258).
+OISVM and IGNGSVM have previously been compared in http://hdl.handle.net/10016/19258.
 Both implementations use [LibSVM for WEKA](https://weka.wikispaces.com/LibSVM?responseToken=128fd0dcc6e4ee7d48ef9847510ab2ed) (its jar file is present in the root of this repo). 
 Support Vectors are retrieved from the SVM using the jar's object.
 ```
