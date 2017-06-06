@@ -1,8 +1,8 @@
-OISVM*
+OISVM
 ===
 Implementation of [Online Incremental Learning Support Vector Machine (OI-SVM)](http://dx.doi.org/10.1007/978-3-642-15822-3_9) for MOA. 
 
-IGNGSVM*
+IGNGSVM
 ===
 Implementation of [incremental Growing Neural Gas Support Vector Machines (iGNGSVM)](https://doi.org/10.1016/j.neucom.2016.12.093) for MOA.
 
