@@ -11,13 +11,13 @@ Implementation of [Online Incremental Learning Support Vector Machine (OI-SVM)](
 Both implementations use [LibSVM for WEKA](https://weka.wikispaces.com/LibSVM?responseToken=128fd0dcc6e4ee7d48ef9847510ab2ed) (its jar file is present in the root of this repo). 
 Support Vectors are retrieved from the SVM using the jar's object.*
 
+Wilson Edited (Also known as Edited Nearest-Neighbor)
+===
+Noise reduction algorithm based in Nearest Neighbors. Proposed by [Dennis Wilson in 1972](https://doi.org/10.1109/TSMC.1972.4309137). See it in '/weka/filters'.
+
 GNG
 ===
 Growing Neural Gas is implemented in [MOA](http://moa.cms.waikato.ac.nz) as topology generation method for IGNGSVM. Proposed by [Fritzke in 1995](https://papers.nips.cc/paper/893-a-growing-neural-gas-network-learns-topologies.pdf).
-
-Wilson Edited (Also known as Edited Nearest-Neighbor)
-===
-Noise reduction algorithm based in Nearest Neighbors. https://doi.org/10.1109/TSMC.1972.4309137
 
 Task & Evaluation
 ====
