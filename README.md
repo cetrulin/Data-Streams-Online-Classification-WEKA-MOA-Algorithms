@@ -1,12 +1,12 @@
 OISVM*
 ===
-Implementation of Online Incremental Learning Support Vector Machine (OI-SVM) for MOA. http://dx.doi.org/10.1007/978-3-642-15822-3_9
+Implementation of [Online Incremental Learning Support Vector Machine (OI-SVM)](http://dx.doi.org/10.1007/978-3-642-15822-3_9) for MOA. 
 
 IGNGSVM*
 ===
-Implementation of iGNGSVM for MOA. https://doi.org/10.1016/j.neucom.2016.12.093
+Implementation of [incremental Growing Neural Gas Support Vector Machines (iGNGSVM)](https://doi.org/10.1016/j.neucom.2016.12.093) for MOA.
 
-OISVM and IGNGSVM have previously been compared in http://hdl.handle.net/10016/19258
+OISVM and IGNGSVM have previously been compared [here](http://hdl.handle.net/10016/19258)
 Both implementations use LibSVM for WEKA (its jar file is present in the root of this repo). 
 Support Vectors are retrieved from the SVM using the jar's object.
 
