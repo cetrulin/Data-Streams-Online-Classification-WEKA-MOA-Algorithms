@@ -9,8 +9,7 @@ Implementation of [Online Incremental Learning Support Vector Machine (OI-SVM)](
 
 ```
 OISVM and IGNGSVM have previously been compared in http://hdl.handle.net/10016/19258.
-Both implementations use [LibSVM for WEKA](https://weka.wikispaces.com/LibSVM), 
-which jar file is present in the root of this repo. 
+Both implementations use LibSVM for WEKA, which jar file is present in the root of this repo. 
 Support Vectors are retrieved from the SVM using the jar's object.
 ```
 
