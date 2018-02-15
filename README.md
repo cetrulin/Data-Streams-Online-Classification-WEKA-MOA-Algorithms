@@ -3,6 +3,8 @@ IGNGSVM
 ===
 Implementation of [incremental Growing Neural Gas Support Vector Machines (iGNGSVM)](https://doi.org/10.1016/j.neucom.2016.12.093) for [MOA](http://moa.cms.waikato.ac.nz). See it in '/moa/classifiers'.
 
+See accepted manuscript [here](https://www.researchgate.net/api/literature/privateDownload?publicationUid=2ZRgHTozmESW2RNzzrHB3UCT92you5j0s6ImIDJ_NoStsFNpriGIC3DMxgSzRujUOw&linkId=sp53_zFnXxEXzNOFqtyM3IurIicVJENjoUMT-EJC-K_YyXlB-o-Cm8Mjo18UHWpZb_FfucQTMNUujhRJIjFdAA).
+
 OISVM
 ===
 Implementation of [Online Incremental Learning Support Vector Machine (OI-SVM)](http://dx.doi.org/10.1007/978-3-642-15822-3_9) for [MOA](http://moa.cms.waikato.ac.nz). See it in '/moa/classifiers'.
