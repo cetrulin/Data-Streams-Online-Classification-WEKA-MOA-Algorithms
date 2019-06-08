@@ -1,9 +1,4 @@
-package moa.clusterers.gng;
-
-/**
-	Version modificada para conexion.java incluido en ILVQ.jar 
-	por Andrés León Suárez Cetrulo
-*/
+package moa.classifiers.igngsvm.gng;
 
 public class Gconexion {
 	public Gprototipo p0;
