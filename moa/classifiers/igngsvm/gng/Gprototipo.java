@@ -102,7 +102,8 @@ public class Gprototipo {
 		for (int i = 0;i<vecinos.size();i++){
 			Gconexion c = vecinos.get(i);
 			if(c.edad>=edad){
-				vecinos.remove(c);
+				vecinos.remove(i);
+				i--;
 				if(c.p0.equals(this)){
 					c.p1.vecinos.remove(c);
 				}else{
@@ -113,11 +114,20 @@ public class Gprototipo {
 	}
 	
 	public void eliminarVecino(Gprototipo p){
-		for (int i = 0 ; i<vecinos.size();i++) {
-			if(vecinos.get(i).p0.equals(p)||vecinos.get(i).p1.equals(p)) 
-				vecinos.remove(vecinos.get(i));
+		for (int i = 0 ; i<this.vecinos.size();i++) {
+			Gconexion c = this.vecinos.get(i);
+			if(c.p0.equals(p)||c.p1.equals(p)) {
+				this.vecinos.remove(i);
+				i--;
+			}
 		}
-			
+		for (int i = 0 ; i<p.vecinos.size();i++) {
+			Gconexion c = p.vecinos.get(i);
+			if(c.p0.equals(this)||c.p1.equals(this)) {
+				p.vecinos.remove(i);
+				i--;
+			}
+		}
 	}
 	
 	public Gprototipo[] recuperarVecindario(){
