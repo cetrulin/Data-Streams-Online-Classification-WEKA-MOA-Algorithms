@@ -31,36 +31,50 @@ public class GNG extends AbstractClusterer {
 	private int neuronasCreadas;	
 	
 	private Instance copia;
+	private double lastNearestDist;
 	
 	public Gprototipo[] obtenerCercanos(double patron[]){
 		Gprototipo ganador,segundon;
 		Gprototipo p[]=new Gprototipo[2];
 		
 		if(S.size()>=2){		
-			if(Gprototipo.dist(S.get(0).w,patron)<=Gprototipo.dist(S.get(1).w,patron)){
+			double d0 = Gprototipo.distSquared(S.get(0).w,patron);
+			double d1 = Gprototipo.distSquared(S.get(1).w,patron);
+			double firstDistSq, secondDistSq;
+			if(d0<=d1){
 				ganador = S.get(0);
-				segundon = S.get(1);			
+				firstDistSq = d0;
+				segundon = S.get(1);
+				secondDistSq = d1;
 			}else{
 				ganador = S.get(1);
+				firstDistSq = d1;
 				segundon = S.get(0);
-				
-			}for (int j = 2; j < S.size(); j++) {
-				if(Gprototipo.dist(S.get(j).w,patron)<Gprototipo.dist(ganador.w,patron)){
+				secondDistSq = d0;
+			}
+			final int size = S.size();
+			for (int j = 2; j < size; j++) {
+				Gprototipo candidate = S.get(j);
+				double dSq = Gprototipo.distSquared(candidate.w,patron);
+				if(dSq<firstDistSq){
 					segundon = ganador;
-					ganador = S.get(j);
-				}else{
-					if(Gprototipo.dist(S.get(j).w,patron)<Gprototipo.dist(segundon.w,patron)){
-						segundon = S.get(j);
-					}
+					secondDistSq = firstDistSq;
+					ganador = candidate;
+					firstDistSq = dSq;
+				}else if(dSq<secondDistSq){
+					segundon = candidate;
+					secondDistSq = dSq;
 				}
-				
-			}p[0]=ganador;
+			}
+			this.lastNearestDist = Math.sqrt(firstDistSq);
+			p[0]=ganador;
 			p[1]=segundon;
 			
 		}else{
 			if(S.size()>0){
 				p[0]=S.get(0);
 				p[1]=S.get(0);
+				this.lastNearestDist = Gprototipo.dist(p[0].w,patron);
 			}else{
 				return null;
 			}
@@ -140,16 +154,19 @@ public class GNG extends AbstractClusterer {
 			s1.actualizarEdades();
 			
 			//4. Variable local de acumulaci�n de error de s1
-			s1.setError(s1.getError()+s1.dist(s1.w.clone(),patron));			
+			s1.setError(s1.getError()+this.lastNearestDist);			
 
 			/*************************************actualizamos las posiciones de los prototipos**************************************/
 	
 			//5. Movemos s1 y sus vecinos con Eb y En
 			
 			s1.actualizarW(BepsilonOption.getValue(), patron);
-			Gprototipo vecinos[] = s1.recuperarVecindario();
-			for (int j = 0; j < vecinos.length; j++) {
-				vecinos[j].actualizarW(NepsilonOption.getValue(), patron);
+			final double nepsilon = NepsilonOption.getValue();
+			final int nSize = s1.vecinos.size();
+			for (int j = 0; j < nSize; j++) {
+				Gconexion edge = s1.vecinos.get(j);
+				Gprototipo nb = (edge.p0 != s1) ? edge.p0 : edge.p1;
+				nb.actualizarW(nepsilon, patron);
 			}						
 			
 			/************************anadimos los nuevos enlaces o actualizamos los ya presentes***********************/
@@ -165,12 +182,13 @@ public class GNG extends AbstractClusterer {
 			/******************************************comenzamos a eliminar prototipos y conexiones *********************************/
 			
 			//7.eliminamos una conexion cuando su edad supera el maximo permitido
-			s1.purgarGconexiones(maxAgeOption.getValue());
-			//Se eliminan los individuos sin conexiones
-			for (int k = 0; k < S.size(); k++) {
-				if(S.get(k).vecinos.size()==0){
-					S.remove(k);
-					--k;
+			if (s1.purgarGconexionesYComprobar(maxAgeOption.getValue())) {
+				//Se eliminan los individuos sin conexiones
+				for (int k = 0; k < S.size(); k++) {
+					if(S.get(k).vecinos.size()==0){
+						S.remove(k);
+						--k;
+					}
 				}
 			}
 			

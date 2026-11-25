@@ -60,19 +60,19 @@ public class Gprototipo {
 	}
 		
 	public static int numeroGprototipos(ArrayList<Gprototipo> lista){
-		int n=0;
-		for (Gprototipo p : lista) {
-			n++;
-		}
-		return n;
+		return lista.size();
 	}
 	
-	public static double dist(double w1[],double w2[]){
+	public static double distSquared(double w1[],double w2[]){
 		double sum = 0;
 		for (int i = 0; i < w1.length; i++) {
 			sum += Math.pow(w1[i]-w2[i],2);
 		}
-		return Math.sqrt(sum);
+		return sum;
+	}
+
+	public static double dist(double w1[],double w2[]){
+		return Math.sqrt(distSquared(w1, w2));
 	}
 	
 	public void anadirVecino(Gprototipo s2){
@@ -99,9 +99,15 @@ public class Gprototipo {
 	}
 	
 	public void purgarGconexiones(double edad){
+		purgarGconexionesYComprobar(edad);
+	}
+
+	public boolean purgarGconexionesYComprobar(double edad){
+		boolean removedAny = false;
 		for (int i = 0;i<vecinos.size();i++){
 			Gconexion c = vecinos.get(i);
 			if(c.edad>=edad){
+				removedAny = true;
 				vecinos.remove(i);
 				i--;
 				if(c.p0.equals(this)){
@@ -111,6 +117,7 @@ public class Gprototipo {
 				}
 			}
 		}
+		return removedAny;
 	}
 	
 	public void eliminarVecino(Gprototipo p){
