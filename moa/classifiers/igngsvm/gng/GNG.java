@@ -1,12 +1,21 @@
+/*
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package moa.classifiers.igngsvm.gng;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import weka.core.Instance;
-import weka.core.Instances;
-import weka.gui.beans.Clusterer;
 
 import moa.cluster.Clustering;
 import moa.clusterers.AbstractClusterer;
@@ -14,269 +23,257 @@ import moa.core.Measurement;
 import moa.options.FloatOption;
 import moa.options.IntOption;
 
+/**
+ * Growing Neural Gas (GNG) incremental topology-preserving clusterer for MOA.
+ *
+ * <p>Implements Bernd Fritzke's (1995) Growing Neural Gas algorithm with
+ * undirected edge aging/pruning and optimized squared-distance nearest-unit
+ * search.</p>
+ *
+ * <p>Reference:<br>
+ * Bernd Fritzke. A Growing Neural Gas Network Learns Topologies.
+ * Advances in Neural Information Processing Systems (NIPS), 1995.</p>
+ *
+ * <p>Parameters:</p>
+ * <ul>
+ * <li>-l : Lambda — number of steps between new unit insertions.</li>
+ * <li>-m : Maximum edge age before pruning.</li>
+ * <li>-a : Error reduction factor {@code alpha} on unit insertion.</li>
+ * <li>-d : Global error decay factor per step.</li>
+ * <li>-e : Winner learning rate {@code epsilon_b}.</li>
+ * <li>-n : Neighbor learning rate {@code epsilon_n}.</li>
+ * <li>-c : Maximum number of prototypes to create (stopping criterion).</li>
+ * </ul>
+ *
+ * @author Andres L. Suarez-Cetrulo
+ */
 public class GNG extends AbstractClusterer {
 
 	private static final long serialVersionUID = -8566293434212159290L;
 
-	private ArrayList<Gprototipo> S;	
+	private ArrayList<GUnit> S;
 	public IntOption lambdaOption = new IntOption("lambda", 'l', "Lambda", 100);
-	public IntOption maxAgeOption = new IntOption("maxAge", 'm',"MaximumAge", 200);
-	public FloatOption alfaOption = new FloatOption("alfa", 'a',"Alfa", 0.5);
-	public FloatOption constantOption = new FloatOption("d", 'd',"d", 0.995);
-	public FloatOption BepsilonOption = new FloatOption("epsilonB", 'e',"EpsilonB", 0.2);
-	public FloatOption NepsilonOption = new FloatOption("epsilonN", 'n',"EpsilonN", 0.006);
-	public IntOption nParadaOption = new IntOption("criterioParada", 'c', "Criterio de parada", 100);
+	public IntOption maxAgeOption = new IntOption("maxAge", 'm', "MaximumAge", 200);
+	public FloatOption alfaOption = new FloatOption("alfa", 'a', "Alfa", 0.5);
+	public FloatOption constantOption = new FloatOption("d", 'd', "d", 0.995);
+	public FloatOption BepsilonOption = new FloatOption("epsilonB", 'e', "EpsilonB", 0.2);
+	public FloatOption NepsilonOption = new FloatOption("epsilonN", 'n', "EpsilonN", 0.006);
+	public IntOption stoppingCriteriaOption = new IntOption("stoppingCriteria", 'c', "Stopping criteria", 100);
 
-	private long patrones_presentados;
-	private int neuronasCreadas;	
-	
-	private Instance copia;
+	private long instancesSeen;
+	private int neuronsCreated;
 	private double lastNearestDist;
-	
-	public Gprototipo[] obtenerCercanos(double patron[]){
-		Gprototipo ganador,segundon;
-		Gprototipo p[]=new Gprototipo[2];
-		
-		if(S.size()>=2){		
-			double d0 = Gprototipo.distSquared(S.get(0).w,patron);
-			double d1 = Gprototipo.distSquared(S.get(1).w,patron);
+
+	/**
+	 * Finds the two closest prototype units (winner {@code s1} and runner-up {@code s2})
+	 * to {@code pattern} using squared Euclidean distance, caching the Euclidean
+	 * distance to {@code s1} in {@code lastNearestDist}.
+	 */
+	public GUnit[] getNearest(double[] pattern) {
+		GUnit first, second;
+		GUnit[] p = new GUnit[2];
+
+		if (this.S.size() >= 2) {
+			double d0 = GUnit.distSquared(this.S.get(0).w, pattern);
+			double d1 = GUnit.distSquared(this.S.get(1).w, pattern);
 			double firstDistSq, secondDistSq;
-			if(d0<=d1){
-				ganador = S.get(0);
+			if (d0 <= d1) {
+				first = this.S.get(0);
 				firstDistSq = d0;
-				segundon = S.get(1);
+				second = this.S.get(1);
 				secondDistSq = d1;
-			}else{
-				ganador = S.get(1);
+			} else {
+				first = this.S.get(1);
 				firstDistSq = d1;
-				segundon = S.get(0);
+				second = this.S.get(0);
 				secondDistSq = d0;
 			}
-			final int size = S.size();
+			final int size = this.S.size();
 			for (int j = 2; j < size; j++) {
-				Gprototipo candidate = S.get(j);
-				double dSq = Gprototipo.distSquared(candidate.w,patron);
-				if(dSq<firstDistSq){
-					segundon = ganador;
+				GUnit candidate = this.S.get(j);
+				double dSq = GUnit.distSquared(candidate.w, pattern);
+				if (dSq < firstDistSq) {
+					second = first;
 					secondDistSq = firstDistSq;
-					ganador = candidate;
+					first = candidate;
 					firstDistSq = dSq;
-				}else if(dSq<secondDistSq){
-					segundon = candidate;
+				} else if (dSq < secondDistSq) {
+					second = candidate;
 					secondDistSq = dSq;
 				}
 			}
 			this.lastNearestDist = Math.sqrt(firstDistSq);
-			p[0]=ganador;
-			p[1]=segundon;
-			
-		}else{
-			if(S.size()>0){
-				p[0]=S.get(0);
-				p[1]=S.get(0);
-				this.lastNearestDist = Gprototipo.dist(p[0].w,patron);
-			}else{
+			p[0] = first;
+			p[1] = second;
+		} else {
+			if (this.S.size() > 0) {
+				p[0] = this.S.get(0);
+				p[1] = this.S.get(0);
+				this.lastNearestDist = GUnit.dist(p[0].w, pattern);
+			} else {
 				return null;
 			}
 		}
 		return p;
 	}
-	
 
 	@Override
 	public boolean isRandomizable() {
 		return false;
 	}
 
-	public ArrayList<Gprototipo> getS (){
-		
-		return S;	
+	/**
+	 * Returns the current list of prototype units in the GNG topology.
+	 */
+	public ArrayList<GUnit> getS() {
+		return this.S;
 	}
 
+	@Override
 	public Clustering getClusteringResult() {
-
 		return null;
 	}
-	
-	public void log (String st)
-  {
-     try {
-		PrintWriter pw = new PrintWriter(new FileWriter ("gng.log",true));		
-		pw.println(st);
-		pw.flush();
-		pw.close ();
-     }
-     catch (Exception e)
-    {  
-    }
-  }
 
 	@Override
 	public void resetLearningImpl() {
-		S = new ArrayList<Gprototipo>();
-		patrones_presentados = 0;
-		neuronasCreadas = 0;
+		this.S = new ArrayList<GUnit>();
+		this.instancesSeen = 0;
+		this.neuronsCreated = 0;
 	}
 
-	public int getCreadas() {		
-		return neuronasCreadas;
+	/**
+	 * Returns the total number of interpolated prototype units created so far.
+	 */
+	public int getNumberOfPrototypesCreated() {
+		return this.neuronsCreated;
 	}
-	
+
 	@Override
 	public void trainOnInstanceImpl(Instance inst) {
-		copia = (Instance) inst.copy();
-		patrones_presentados++;
-		//1. Distribucion de entrada
-		double []patron =  new double[inst.numValues()-1];
-		for (int i = 0; i < patron.length; i++) {
-			patron[i]=inst.value(i);
+		this.instancesSeen++;
+
+		// 1. Input distribution (excluding class attribute)
+		double[] pattern = new double[inst.numValues() - 1];
+		for (int i = 0; i < pattern.length; i++) {
+			pattern[i] = inst.value(i);
 		}
-		//System.out.println("-----------------"+inst.value(0)+" "+inst.classValue());
-		/**********************************seguimos inicializando patrones*************************************************/
-		
-		if(Gprototipo.numeroGprototipos(S)<2){			
-			//Se guarda como clase 0, ya que GNG no gestiona las clases. No es un algoritmo de clasificacion.
-			Gprototipo p = new Gprototipo(patron,0);
 
-			if(!S.contains(p))
-				S.add(p);
-			
-		}else if(neuronasCreadas < nParadaOption.getValue()){
-						
-			//2. Se encuentra s1 y s2		
-			Gprototipo []mejores;
-			Gprototipo s1=null,s2=null;
-			mejores = obtenerCercanos(patron);
-			s1 = mejores[0];
-			s2 = mejores[1];			
-			
-			//3. Se incrementa la edad de todas las conexiones de s1
-			s1.actualizarEdades();
-			
-			//4. Variable local de acumulaci�n de error de s1
-			s1.setError(s1.getError()+this.lastNearestDist);			
-
-			/*************************************actualizamos las posiciones de los prototipos**************************************/
-	
-			//5. Movemos s1 y sus vecinos con Eb y En
-			
-			s1.actualizarW(BepsilonOption.getValue(), patron);
-			final double nepsilon = NepsilonOption.getValue();
-			final int nSize = s1.vecinos.size();
-			for (int j = 0; j < nSize; j++) {
-				Gconexion edge = s1.vecinos.get(j);
-				Gprototipo nb = (edge.p0 != s1) ? edge.p0 : edge.p1;
-				nb.actualizarW(nepsilon, patron);
-			}						
-			
-			/************************anadimos los nuevos enlaces o actualizamos los ya presentes***********************/
-			
-			//6. Reseteo de conexiones entre s1 y s2
-			Gconexion c = s1.buscarEnlace(s2);
-			if(c==null){
-				s1.anadirVecino(s2);
-			}else{;
-				c.edad=0;
+		if (GUnit.getNumberOfGPrototypes(this.S) < 2) {
+			// Stored with label 0 since GNG is unsupervised (each class is modeled in its own GNG instance)
+			GUnit p = new GUnit(pattern, 0);
+			if (!this.S.contains(p)) {
+				this.S.add(p);
 			}
-			
-			/******************************************comenzamos a eliminar prototipos y conexiones *********************************/
-			
-			//7.eliminamos una conexion cuando su edad supera el maximo permitido
-			if (s1.purgarGconexionesYComprobar(maxAgeOption.getValue())) {
-				//Se eliminan los individuos sin conexiones
-				for (int k = 0; k < S.size(); k++) {
-					if(S.get(k).vecinos.size()==0){
-						S.remove(k);
+		} else if (this.neuronsCreated < this.stoppingCriteriaOption.getValue()) {
+
+			// 2. Find the two nearest units s1 and s2
+			GUnit[] best = getNearest(pattern);
+			GUnit s1 = best[0];
+			GUnit s2 = best[1];
+
+			// 3. Increment the age of all edges emanating from s1
+			s1.updateAges();
+
+			// 4. Accumulate local error for s1
+			s1.setError(s1.getError() + this.lastNearestDist);
+
+			// 5. Move s1 and its direct topological neighbors toward pattern using epsilon_b and epsilon_n
+			s1.updateW(this.BepsilonOption.getValue(), pattern);
+			final double nepsilon = this.NepsilonOption.getValue();
+			final int nSize = s1.neighbors.size();
+			for (int j = 0; j < nSize; j++) {
+				GEdge edge = s1.neighbors.get(j);
+				GUnit nb = (edge.p0 != s1) ? edge.p0 : edge.p1;
+				nb.updateW(nepsilon, pattern);
+			}
+
+			// 6. Connect s1 and s2 (or reset existing edge age to 0)
+			GEdge c = s1.searchEdge(s2);
+			if (c == null) {
+				s1.addNeighbor(s2);
+			} else {
+				c.age = 0;
+			}
+
+			// 7. Remove edges exceeding maxAge and purge any resulting isolated units
+			if (s1.purgeGEdgesAndCheck(this.maxAgeOption.getValue())) {
+				for (int k = 0; k < this.S.size(); k++) {
+					if (this.S.get(k).neighbors.size() == 0) {
+						this.S.remove(k);
 						--k;
 					}
 				}
 			}
-			
-			//8.si llegamos a una iteracion multiplo de lambda se interpola
-			if(patrones_presentados%lambdaOption.getValue()==0&&patrones_presentados>0){
-				
-				//Se determina el punto q con mayor error
-				double mayor = 0;
-				int posMayor = 0;
-				for(int i = 0; i < S.size(); i++){
-					Gprototipo actual = S.get(i);
-					double error = actual.getError();
-					if(error>mayor){
-						mayor = error;
-						posMayor = i;
+
+			// 8. Every lambda steps, insert a new unit r between the highest-error unit q and its worst neighbor f
+			if (this.instancesSeen % this.lambdaOption.getValue() == 0 && this.instancesSeen > 0) {
+				// Find unit q with the maximum accumulated error
+				double greatest = 0;
+				int posGreatest = 0;
+				for (int i = 0; i < this.S.size(); i++) {
+					GUnit current = this.S.get(i);
+					double error = current.getError();
+					if (error > greatest) {
+						greatest = error;
+						posGreatest = i;
 					}
-				}Gprototipo q = S.get(posMayor);
-				
-				//Se calcula el vecino de q con mas error
-				Gprototipo f;
-				double error;
-				mayor = 0;
-				int posMayorVecino = 0;
-				for (int i = 0; i < q.vecinos.size(); i++) {
-					Gconexion actual = q.vecinos.get(i);
-					error = 0;
-					if(actual.p0.equals(q)){
-						error = actual.p1.getError();
-					}else{
-						error = actual.p0.getError();
-					}
-					if(error>mayor){
-						mayor = error;
-						posMayorVecino = i;
-					}
-				}if(q.vecinos.get(posMayorVecino).p0.equals(q)){
-					f = q.vecinos.get(posMayorVecino).p1;
-				}else{
-					f = q.vecinos.get(posMayorVecino).p0;
 				}
-				
-				//Se coloca r entre q y el vecino f que mas error tenga
-				double wr[] = new double [q.w.length];				
+				GUnit q = this.S.get(posGreatest);
+
+				// Find neighbor f of q with the maximum error
+				GUnit f;
+				double error;
+				greatest = 0;
+				int posGreatestNeighbor = 0;
+				for (int i = 0; i < q.neighbors.size(); i++) {
+					GEdge current = q.neighbors.get(i);
+					if (current.p0.equals(q)) {
+						error = current.p1.getError();
+					} else {
+						error = current.p0.getError();
+					}
+					if (error > greatest) {
+						greatest = error;
+						posGreatestNeighbor = i;
+					}
+				}
+				if (q.neighbors.get(posGreatestNeighbor).p0.equals(q)) {
+					f = q.neighbors.get(posGreatestNeighbor).p1;
+				} else {
+					f = q.neighbors.get(posGreatestNeighbor).p0;
+				}
+
+				// Interpolate new prototype r halfway between q and f
+				double[] wr = new double[q.w.length];
 				for (int i = 0; i < wr.length; i++) {
-					wr[i]=0.5*(q.w[i]+f.w[i]);
-					
-				}//se crea el nuevo prototipo (la clase es indiferente pues no es gestionada por GNG)
-				Gprototipo r = new Gprototipo(wr,0);
-				
-				//Se conecta r con q y f y se elimina la conexion q-f
-				r.anadirVecino(q);
-				r.anadirVecino(f);
-				q.eliminarVecino(f);
-				
-				//Error de q y f se descrementa multiplicandolo por alfa.
-				double aux = q.getError();
-				aux*=alfaOption.getValue();
-				q.setError(aux);
-				aux = f.getError();
-				aux*=alfaOption.getValue();
-				f.setError(aux);
-				
-				//Error r = nuevo error q
+					wr[i] = 0.5 * (q.w[i] + f.w[i]);
+				}
+				GUnit r = new GUnit(wr, 0);
+
+				// Connect r to q and f, and remove edge q-f
+				r.addNeighbor(q);
+				r.addNeighbor(f);
+				q.removeNeighbor(f);
+
+				// Decrease error variables of q and f by factor alpha
+				q.setError(q.getError() * this.alfaOption.getValue());
+				f.setError(f.getError() * this.alfaOption.getValue());
+
+				// Initialize error of r with the updated error of q
 				r.setError(q.getError());
-				
-				//Se actualiza S
-				S.add(r);
-				neuronasCreadas++;
-				
-				//S.set(posMayor, q);
-				//S.set(posMayorVecino, f);
-				
+
+				this.S.add(r);
+				this.neuronsCreated++;
 			}
-			
-			//9.Se reducen las variables de error multiplicandolas por d.			
-			for(int i = 0; i < S.size(); i++){
-				Gprototipo actual = S.get(i);
-				double error = actual.getError();
-				error *= constantOption.getValue();
-				actual.setError(error);
-				//S.set(i, actual);
+
+			// 9. Decay all unit error variables by factor d
+			for (int i = 0; i < this.S.size(); i++) {
+				GUnit current = this.S.get(i);
+				current.setError(current.getError() * this.constantOption.getValue());
 			}
-			
-		}	
-		
-//		System.out.println(G);
+		}
 	}
-	
+
 	@Override
 	protected Measurement[] getModelMeasurementsImpl() {
 		return null;
@@ -284,12 +281,11 @@ public class GNG extends AbstractClusterer {
 
 	@Override
 	public void getModelDescription(StringBuilder out, int indent) {
-        out.append("Growing Neural Gas for MOA, Implement by Andres Leon Suarez Cetrulo.");		
+		out.append("Growing Neural Gas for MOA, implemented by Andres L. Suarez-Cetrulo.");
 	}
 
 	@Override
 	public double[] getVotesForInstance(Instance inst) {
 		return null;
 	}
-
 }
